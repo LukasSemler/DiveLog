@@ -1,6 +1,6 @@
 <template>
   <div class="m-4">
-    <h3 class="text-lg font-medium leading-6 text-gray-900">Your stats</h3>
+    <h3 class="text-lg font-medium leading-6 text-gray-900">Your stats:</h3>
     <dl class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
       <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
         <dt class="truncate text-sm font-medium text-gray-500">Total Dives</dt>
@@ -16,6 +16,11 @@
       </div>
     </dl>
   </div>
+
+  <br>
+  <hr>
+  <br>
+
 
   <div class="px-4 sm:px-6 lg:px-8 m-4">
     <div class="sm:flex sm:items-center">

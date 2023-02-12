@@ -86,7 +86,7 @@ import { useRouter } from 'vue-router';
 import axios from 'axios';
 import useValidate from '@vuelidate/core';
 import { required, email } from '@vuelidate/validators';
-import { diveStore } from '../Store/Store';
+import { diveStore } from '../Store/Store.js';
 const store = diveStore();
 
 const router = useRouter();

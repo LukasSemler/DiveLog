@@ -1,16 +1,16 @@
 import { defineStore } from 'pinia';
 
 //Die Funktion läuft intern bei allen actions ab um den State im localstorage zu speichern
-// function SaveState(abmelden) {
-//   const store = PiniaStore();
+function SaveState(abmelden) {
+  const store = diveStore();
 
-//   //   State speichern
-//   if (store.aktiverUser != null) {
-//     localStorage.setItem(store.$id, JSON.stringify(store.$state));
-//   } else if (abmelden) {
-//     localStorage.setItem(store.$id, JSON.stringify(store.$state));
-//   }
-// }
+  //   State speichern
+  if (store.aktiverUser != null) {
+    localStorage.setItem(store.$id, JSON.stringify(store.$state));
+  } else if (abmelden) {
+    localStorage.setItem(store.$id, JSON.stringify(store.$state));
+  }
+}
 
 //MainStore
 export const diveStore = defineStore('diveLog', {
@@ -24,6 +24,8 @@ export const diveStore = defineStore('diveLog', {
   actions: {
     setAktivenUser(user) {
       this.aktiverUser = user;
+
+      SaveState();
     },
   },
 });
