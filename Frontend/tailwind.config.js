@@ -6,12 +6,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // weManageOrange: '#00CFD6',
-        // weManageOrange: '#07D600',
-        weManageOrange: '#E80C3B',
-        weManageOrangeHover: '#BD0930',
-        weManageGray: '#2C2C2C',
-        weManageLightGray: '#383838',
+        divelogBlue: '#03C7FC',
+        divelogDarkBlue: '#01627D',
+        diveRed: '#E84855',
       },
     },
   },

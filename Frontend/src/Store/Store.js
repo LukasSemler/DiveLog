@@ -13,11 +13,17 @@ import { defineStore } from 'pinia';
 // }
 
 //MainStore
-export const PiniaStore = defineStore('diveLog', {
+export const diveStore = defineStore('diveLog', {
   //State
-  state: () => ({}),
+  state: () => ({
+    aktiverUser: {},
+  }),
   //Getter
   getters: {},
   //Actions
-  actions: {},
+  actions: {
+    setAktivenUser(user) {
+      this.aktiverUser = user;
+    },
+  },
 });

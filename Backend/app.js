@@ -26,8 +26,8 @@ app.use(express.static(path.join(dirname, '/public')));
 app.use(express.json());
 
 app.use('/', routen);
-app.use(errorHandler);
 app.use(notFoundHandler);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 

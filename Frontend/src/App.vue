@@ -1,9 +1,9 @@
 <script setup>
 import { onMounted } from 'vue';
 import { RouterView } from 'vue-router';
-import { PiniaStore } from './Store/Store.js';
+import { diveStore } from './Store/Store.js';
 
-const store = PiniaStore();
+const store = diveStore();
 
 // onMounted(() => {
 //   if (localStorage.getItem(store.$id)) {
