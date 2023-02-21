@@ -19,16 +19,6 @@
               class="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
               >Log Dive</a
             >
-            <a
-              href="#"
-              class="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
-              >Projects</a
-            >
-            <a
-              href="#"
-              class="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
-              >Calendar</a
-            >
           </div>
         </div>
         <div class="hidden sm:ml-6 sm:flex sm:items-center">
@@ -73,7 +63,7 @@
                 </MenuItem>
                 <MenuItem v-slot="{ active }">
                   <a
-                    href="#"
+                    @click="abmelden"
                     :class="[active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700']"
                     >Sign out</a
                   >
@@ -140,8 +130,8 @@
             >Settings</DisclosureButton
           >
           <DisclosureButton
+            @click="abmelden"
             as="a"
-            href="#"
             class="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
             >Sign out</DisclosureButton
           >
@@ -173,9 +163,15 @@ import {
 } from '@headlessui/vue';
 import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline';
 import { diveStore } from '../Store/Store.js';
+import { useRouter } from 'vue-router';
 
 import DivesTable from '../components/DivesTable.vue';
-import DiveStats from '../components/DiveStats.vue';
 
 const store = diveStore();
+const router = useRouter();
+
+function abmelden() {
+  store.deleteAktivenUser();
+  router.push('/');
+}
 </script>

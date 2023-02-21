@@ -7,6 +7,7 @@ import axios from 'axios';
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 import { registerSW } from 'virtual:pwa-register';
+import { UploadMedia, UpdateMedia } from 'vue-media-upload';
 
 //Base-URL axios
 if (location.origin === 'http://localhost:8080' || location.origin === 'http://localhost:5050') {
@@ -30,5 +31,8 @@ app.use(router);
 
 //Datepicker
 app.component('Datepicker', Datepicker);
+
+app.component('upload-media', UploadMedia);
+app.component('update-media', UpdateMedia);
 
 app.mount('#app');

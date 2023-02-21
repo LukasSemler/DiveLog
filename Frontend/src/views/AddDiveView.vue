@@ -63,6 +63,16 @@
                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-divelogBlue focus:ring-divelogBlue sm:text-sm"
               />
             </div>
+            <p class="my-3 text-gray-500">or pick your current location</p>
+
+            <div class="flex flex-row justify-center">
+              <button
+                type="button"
+                class="mt-4 inline-flex items-center rounded-md border border-transparent bg-divelogBlue px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-divelogDarkBlue focus:outline-none focus:ring-2 focus:ring-divelogBlue focus:ring-offset-2"
+              >
+                Get current location
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -289,7 +299,13 @@
                     class="relative cursor-pointer rounded-md bg-white font-medium text-divelogBlue focus-within:outline-none focus-within:ring-2 focus-within:ring-divelogBlue focus-within:ring-offset-2 hover:text-divelogBlue"
                   >
                     <p class="text-center">Upload a file</p>
-                    <input id="file-upload" name="file-upload" type="file" class="sr-only" />
+                    <input
+                      id="file-upload"
+                      name="file-upload"
+                      type="file"
+                      class="sr-only"
+                      multiple="true"
+                    />
                   </label>
                 </div>
                 <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
@@ -303,6 +319,7 @@
     <div class="pt-5">
       <div class="flex justify-end">
         <button
+          @click="router.push(`/home`)"
           type="button"
           class="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-divelogBlue focus:ring-offset-2"
         >

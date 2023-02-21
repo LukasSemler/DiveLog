@@ -17,10 +17,9 @@
     </dl>
   </div>
 
-  <br>
-  <hr>
-  <br>
-
+  <br />
+  <hr />
+  <br />
 
   <div class="px-4 sm:px-6 lg:px-8 m-4">
     <div class="sm:flex sm:items-center">
@@ -64,6 +63,7 @@
                   v-for="(dive, diveIdx) in dives"
                   :key="diveIdx"
                   :class="diveIdx % 2 === 0 ? undefined : 'bg-gray-50'"
+                  @click="showDetail(dive)"
                 >
                   <td
                     class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6"
@@ -109,4 +109,9 @@ const totalDiveTime = computed(() => {
   });
   return totalDiveTime;
 });
+
+function showDetail(dive) {
+  console.log(dive.d_ID);
+  router.push(`/diveDetail/${dive.d_ID}`);
+}
 </script>

@@ -1,4 +1,4 @@
-import { getAllDivesDB } from '../models/dives_Models.js';
+import { getAllDivesDB, getSingleDiveDB } from '../models/dives_Models.js';
 
 const getAllDives = async (req, res) => {
   const { id } = req.params;
@@ -7,4 +7,13 @@ const getAllDives = async (req, res) => {
   if (dives) return res.status(200).json(dives);
 };
 
-export { getAllDives };
+const getSingleDive = async (req, res) => {
+  const { u_ID, d_ID } = req.params;
+
+  const dive = await getSingleDiveDB(u_ID, d_ID);
+
+  if (dive) return res.status(200).json(dive);
+  return res.status(404).send('Dive not Found');
+};
+
+export { getAllDives, getSingleDive };

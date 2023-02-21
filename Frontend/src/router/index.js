@@ -5,6 +5,7 @@ import LoginComp from '../components/LoginComp.vue';
 import RegisterComp from '../components/RegisterComp.vue';
 import HomeView from '../views/HomeView.vue';
 import AddDiveView from '../views/AddDiveView.vue';
+import diveDetail from '../views/DiveDetailView.vue';
 import { diveStore } from '../Store/Store.js';
 
 const router = createRouter({
@@ -36,6 +37,20 @@ const router = createRouter({
       path: '/addDive',
       name: 'Add Dive',
       component: AddDiveView,
+    },
+    {
+      path: '/diveDetail/:id',
+      params: true,
+      name: 'DiveDetail',
+      component: diveDetail,
+      beforeEnter: (to, from, next) => {
+        const store = diveStore();
+        if (store.aktiverUser) {
+          next();
+        } else {
+          next('/');
+        }
+      },
     },
     { path: '/:pathmatch(.*)*', name: 'not-found', component: NotFoundView },
   ],

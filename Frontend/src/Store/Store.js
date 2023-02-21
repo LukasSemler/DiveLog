@@ -27,5 +27,9 @@ export const diveStore = defineStore('diveLog', {
 
       SaveState();
     },
+    deleteAktivenUser() {
+      this.aktiverUser = null;
+      SaveState(true);
+    },
   },
 });

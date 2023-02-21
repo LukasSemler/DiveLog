@@ -21,11 +21,13 @@
     "daisyui": "^2.31.0",
     "install": "^0.13.0",
     "lightvue": "^0.4.8",
+    "mapbox-gl": "^2.12.1",
     "npm": "^8.18.0",
     "pinia": "^2.0.13",
     "vue": "^3.2.29",
     "vue-cal": "^4.8.0",
     "vue-chartjs": "^4.1.2",
+    "vue-media-upload": "^1.2.1",
     "vue-router": "^4.0.13"
   },
   "devDependencies": {

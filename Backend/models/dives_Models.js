@@ -8,4 +8,14 @@ const getAllDivesDB = async (id) => {
   return false;
 };
 
-export { getAllDivesDB };
+const getSingleDiveDB = async (u_ID, d_ID) => {
+  const { rows } = await query('SELECT * FROM dive where fk_user = $1 AND "d_ID" = $2;', [
+    u_ID,
+    d_ID,
+  ]);
+
+  if (rows[0]) return rows;
+  return false;
+};
+
+export { getAllDivesDB, getSingleDiveDB };
