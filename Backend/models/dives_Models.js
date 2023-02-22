@@ -1,7 +1,7 @@
 import { query } from '../db/index.js';
 
 const getAllDivesDB = async (id) => {
-  const { rows } = await query('SELECT * FROM dive where fk_user = $1;', [id]);
+  const { rows } = await query('SELECT * FROM dive where fk_user = $1 order by nr ASC;', [id]);
 
   if (rows[0]) return rows;
 
@@ -18,4 +18,46 @@ const getSingleDiveDB = async (u_ID, d_ID) => {
   return false;
 };
 
-export { getAllDivesDB, getSingleDiveDB };
+const addDiveDB = async (
+  title,
+  date,
+  country,
+  divesite,
+  coords,
+  depth,
+  airIn,
+  airOut,
+  weight,
+  air,
+  suit,
+  time,
+  u_id,
+) => {
+  const { rows } = await query('SELECT * FROM dive where fk_user = 3 ORDER BY nr ASC;');
+
+  if (rows[0]) {
+    const { rows: insert } = await query(
+      'INSERT INTO dive (title, date, location, divesite, "airIn", "airOut", depth, weight, "airType", suit, nr, fk_user,"diveTime") values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) returning *',
+      [
+        title,
+        date,
+        country,
+        divesite,
+        airIn,
+        airOut,
+        depth,
+        weight,
+        air,
+        suit,
+        rows[rows.length - 1].nr + 1,
+        u_id,
+        time,
+      ],
+    );
+
+    if (insert[0]) return insert;
+    return false;
+  }
+};
+
+export { getAllDivesDB, getSingleDiveDB, addDiveDB };

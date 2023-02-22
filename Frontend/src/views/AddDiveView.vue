@@ -25,6 +25,7 @@
                 name="title"
                 id="title"
                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-divelogBlue focus:ring-divelogBlue sm:text-sm"
+                v-model="title"
               />
             </div>
           </div>
@@ -37,6 +38,7 @@
                 name="date"
                 id="date"
                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-divelogBlue focus:ring-divelogBlue sm:text-sm"
+                v-model="date"
               />
             </div>
           </div>
@@ -49,6 +51,7 @@
                 name="country"
                 type="text"
                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-divelogBlue focus:ring-divelogBlue sm:text-sm"
+                v-model="country"
               />
             </div>
           </div>
@@ -61,6 +64,7 @@
                 name="divesite"
                 type="text"
                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-divelogBlue focus:ring-divelogBlue sm:text-sm"
+                v-model="divesite"
               />
             </div>
             <p class="my-3 text-gray-500">or pick your current location</p>
@@ -69,10 +73,15 @@
               <button
                 type="button"
                 class="mt-4 inline-flex items-center rounded-md border border-transparent bg-divelogBlue px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-divelogDarkBlue focus:outline-none focus:ring-2 focus:ring-divelogBlue focus:ring-offset-2"
+                @click="getCurrentPosition"
               >
                 Get current location
               </button>
             </div>
+            <br />
+
+            <!-- Karte -->
+            <div :style="`height: ${mapHeight}`" id="map"></div>
           </div>
         </div>
       </div>
@@ -92,6 +101,7 @@
                 name="depth"
                 id="depth"
                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-divelogBlue focus:ring-divelogBlue sm:text-sm"
+                v-model="depth"
               />
             </div>
           </div>
@@ -103,6 +113,7 @@
                 name="time"
                 id="time"
                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-divelogBlue focus:ring-divelogBlue sm:text-sm"
+                v-model="time"
               />
             </div>
           </div>
@@ -115,6 +126,7 @@
                 name="airIn"
                 id="airIn"
                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-divelogBlue focus:ring-divelogBlue sm:text-sm"
+                v-model="airIn"
               />
             </div>
           </div>
@@ -127,6 +139,7 @@
                 name="airOut"
                 id="airOut"
                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-divelogBlue focus:ring-divelogBlue sm:text-sm"
+                v-model="airOut"
               />
             </div>
           </div>
@@ -200,6 +213,7 @@
                 name="weight"
                 id="weight"
                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-divelogBlue focus:ring-divelogBlue sm:text-sm"
+                v-model="weight"
               />
             </div>
           </div>
@@ -328,6 +342,7 @@
         <button
           type="submit"
           class="ml-3 inline-flex justify-center rounded-md border border-transparent bg-divelogBlue py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg--divelogBlue focus:outline-none focus:ring-2 focus:ring-divelogBlue focus:ring-offset-2"
+          @click="sendData"
         >
           Save
         </button>
@@ -349,6 +364,31 @@ import {
   ComboboxOption,
   ComboboxOptions,
 } from '@headlessui/vue';
+import mapbox from 'mapbox-gl';
+import axios from 'axios';
+import { diveStore } from '../Store/Store.js';
+
+const router = useRouter();
+const store = diveStore();
+
+//MAP
+let map = ref(null);
+let mapAccessToken = ref(
+  'pk.eyJ1IjoibHVrYXNzZW1sZXIiLCJhIjoiY2xlZTM3MzlyMDVuODN0b2NueWQ1OHNpZyJ9.NboOeOXWIhK0vucp7B9A5w',
+);
+let mapStyle = 'mapbox://styles/lukassemler/clbaoba0t007t14nt6n0qujvl';
+let mapHeight = ref('0px');
+
+let title = ref('');
+let date = ref(null);
+let country = ref('');
+let divesite = ref('');
+let coords = ref(null);
+let depth = ref(null);
+let time = ref(null);
+let airIn = ref(null);
+let airOut = ref(null);
+let weight = ref(null);
 
 // Combobox Suit
 const suits = [
@@ -391,5 +431,61 @@ const filteredAir = computed(() =>
       }),
 );
 
-const router = useRouter();
+async function getCurrentPosition() {
+  //Aktuellen Standort bekommen
+  let getCoordinates = () =>
+    new Promise(function (resolve, reject) {
+      navigator.geolocation.getCurrentPosition(resolve, reject);
+    });
+
+  let {
+    coords: { latitude: lat, longitude: lng },
+  } = await getCoordinates();
+
+  coords.value = [lng, lat];
+
+  console.log(lat, lng);
+
+  mapHeight.value = '300px';
+
+  //Map-Initialisieren
+  mapbox.accessToken = mapAccessToken.value;
+  mapbox._isVue = true;
+  map.value = new mapbox.Map({
+    container: 'map', // container ID
+    style: mapStyle, // style URL
+    center: [lng, lat],
+    zoom: 13, // starting zoom
+  });
+
+  new mapbox.Marker({
+    anchor: 'center',
+    color: '#03C7FC',
+  })
+    .setLngLat([lng, lat])
+    .addTo(map.value);
+}
+
+async function sendData(e) {
+  e.preventDefault();
+
+  if (coords.value) {
+    const { data } = await axios.post(`http://localhost:3000/addDive/${store.aktiverUser.u_id}`, {
+      title: title.value,
+      date: date.value,
+      country: country.value,
+      divesite: divesite.value,
+      depth: depth.value,
+      airIn: airIn.value,
+      airOut: airOut.value,
+      weight: weight.value,
+      air: selectedAir.value.name,
+      suit: selectedSuit.value.name,
+      coords: coords.value,
+      time: time.value,
+    });
+
+    console.log(data);
+  } else console.log('not working');
+}
 </script>
