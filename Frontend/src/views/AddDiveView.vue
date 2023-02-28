@@ -450,8 +450,7 @@ async function getCurrentPosition() {
 
   //Map-Initialisieren
   mapbox.accessToken = mapAccessToken.value;
-  mapbox._isVue = true;
-  map.value = new mapbox.Map({
+  map.value = await new mapbox.Map({
     container: 'map', // container ID
     style: mapStyle, // style URL
     center: [lng, lat],
@@ -486,6 +485,21 @@ async function sendData(e) {
     });
 
     console.log(data);
-  } else console.log('not working');
+  } else {
+    const { data } = await axios.post(`http://localhost:3000/addDive/${store.aktiverUser.u_id}`, {
+      title: title.value,
+      date: date.value,
+      country: country.value,
+      divesite: divesite.value,
+      depth: depth.value,
+      airIn: airIn.value,
+      airOut: airOut.value,
+      weight: weight.value,
+      air: selectedAir.value.name,
+      suit: selectedSuit.value.name,
+      coords: null,
+      time: time.value,
+    });
+  }
 }
 </script>

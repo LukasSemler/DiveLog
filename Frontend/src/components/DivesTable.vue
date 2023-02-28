@@ -16,7 +16,10 @@
       </div>
     </dl>
   </div>
-
+  <br />
+  <hr />
+  <h1 class="text-center text-3xl font-bold my-4">All your Dives</h1>
+  <div id="map" style="height: 300px"></div>
   <br />
   <hr />
   <br />
@@ -89,10 +92,18 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 import { diveStore } from '../Store/Store.js';
 import { useRouter } from 'vue-router';
+import mapbox from 'mapbox-gl';
+
+//MAP
+let map = ref(null);
+let mapAccessToken = ref(
+  'pk.eyJ1IjoibHVrYXNzZW1sZXIiLCJhIjoiY2xlZTM3MzlyMDVuODN0b2NueWQ1OHNpZyJ9.NboOeOXWIhK0vucp7B9A5w',
+);
+let mapStyle = 'mapbox://styles/lukassemler/clbaoba0t007t14nt6n0qujvl';
 
 const router = useRouter();
 const store = diveStore();
@@ -101,6 +112,23 @@ let dives = ref([]);
 const { data } = await axios.get(`http://localhost:3000/dives/${store.aktiverUser.u_id}`);
 console.log(data);
 dives.value = data;
+
+onMounted(() => {
+  map.value = new mapbox.Map({
+    container: 'map',
+    style: mapStyle,
+    accessToken: mapAccessToken.value,
+    center: [14, 50],
+    zoom: 1,
+  });
+  for (const iterator of dives.value) {
+    const coords = JSON.parse(iterator.coords);
+
+    new mapbox.Marker({ anchor: 'center', color: '#03C7FC' })
+      .setLngLat([coords[0], coords[1]])
+      .addTo(map.value);
+  }
+});
 
 const totalDiveTime = computed(() => {
   let totalDiveTime = 0;

@@ -36,6 +36,7 @@
           </dd>
         </div>
       </dl>
+      <!-- <div :style="`height: ${mapHeight}`" id="map"></div> -->
     </div>
   </div>
   <br />
@@ -82,23 +83,53 @@
       </dl>
     </div>
   </div>
+  <h1 class="text-center text-xl my-4">View you Dive on the Map</h1>
+  <div id="karte" style="height: 300px"></div>
 </template>
 
 <script setup>
 import axios from 'axios';
+import mapbox from 'mapbox-gl';
 import { diveStore } from '../Store/Store.js';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 
 const props = defineProps({
   diveID: String,
 });
 
 const store = diveStore();
+//MAP
+let map = ref(null);
+let mapAccessToken = ref(
+  'pk.eyJ1IjoibHVrYXNzZW1sZXIiLCJhIjoiY2xlZTM3MzlyMDVuODN0b2NueWQ1OHNpZyJ9.NboOeOXWIhK0vucp7B9A5w',
+);
+let mapStyle = 'mapbox://styles/lukassemler/clbaoba0t007t14nt6n0qujvl';
+let mapHeight = ref('0px');
 
 const { data } = await axios.get(
   `http://localhost:3000/getDiveInfo/${store.aktiverUser.u_id}/${props.diveID}`,
 );
-console.log(data);
+
+const coordinaten = JSON.parse(data[0].coords);
+
+onMounted(async () => {
+  mapHeight.value = '300px';
+
+  mapbox.accessToken = mapAccessToken.value;
+  map.value = await new mapbox.Map({
+    container: 'karte', // container ID
+    style: mapStyle, // style URL
+    center: [coordinaten[0], coordinaten[1]],
+    zoom: 4, // starting zoom
+  });
+
+  new mapbox.Marker({
+    anchor: 'center',
+    color: '#03C7FC',
+  })
+    .setLngLat([coordinaten[0], coordinaten[1]])
+    .addTo(map.value);
+});
 
 let diveDetail = ref(data[0]);
 </script>
