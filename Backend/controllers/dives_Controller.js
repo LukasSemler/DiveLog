@@ -19,7 +19,7 @@ const getSingleDive = async (req, res) => {
 const addDive = async (req, res) => {
   const { id } = req.params;
 
-  const { title, date, country, divesite, coords, depth, airIn, airOut, weight, air, suit, time } =
+  const { title, date, country, divesite, coords, depth, airIn, airOut, weight, air, suit, time, image } =
     req.body;
 
   const result = await addDiveDB(
@@ -36,6 +36,7 @@ const addDive = async (req, res) => {
     suit,
     time,
     id,
+    image
   );
 
   if (result) return res.status(200).json(result);

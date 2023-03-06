@@ -206,13 +206,9 @@
 </template>
 
 <script setup>
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
-// import { MailIcon } from '@heroicons/vue/outline';
-// import { XCircleIcon } from '@heroicons/vue/outline';
-// import { XIcon } from '@heroicons/vue/solid';
 
 import { useRouter } from 'vue-router';
-import { reactive, computed, ref, nextTick } from 'vue';
+import { reactive, computed, ref } from 'vue';
 
 import useValidate from '@vuelidate/core';
 import { required, email, numeric, minLength, sameAs } from '@vuelidate/validators';

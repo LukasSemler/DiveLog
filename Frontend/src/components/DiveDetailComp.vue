@@ -85,6 +85,11 @@
   </div>
   <h1 class="text-center text-xl my-4">View you Dive on the Map</h1>
   <div id="karte" style="height: 300px"></div>
+  <br />
+  <hr />
+  <br />
+  <h1 class="text-center text-xl font-bold my-3">The best Image from your Dive</h1>
+  <img :src="diveDetail.image" alt="" />
 </template>
 
 <script setup>

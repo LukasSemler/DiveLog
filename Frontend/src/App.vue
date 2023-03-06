@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { RouterView } from 'vue-router';
 import { diveStore } from './Store/Store.js';
 import { onlineTest } from '@/utils/onlineTest.js';

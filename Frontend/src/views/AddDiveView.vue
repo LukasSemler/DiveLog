@@ -283,48 +283,70 @@
         <div>
           <h3 class="text-lg font-medium leading-6 text-gray-900">Memories</h3>
           <p class="mt-1 text-sm text-gray-500">
-            Here you can Upload a few Images from the dive if you want.
+            Here you can upload the beste Image from the dive
           </p>
         </div>
-        <div class="mt-6">
-          <div class="sm:col-span-6">
-            <label for="cover-photo" class="block text-sm font-medium text-gray-700">Image</label>
-            <div
-              class="mt-1 flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pt-5 pb-6"
-            >
-              <div class="space-y-1 text-center">
-                <svg
-                  class="mx-auto h-12 w-12 text-gray-400"
-                  stroke="currentColor"
-                  fill="none"
-                  viewBox="0 0 48 48"
-                  aria-hidden="true"
+        <div class="sm:col-span-2">
+          <label for="cover-photo" class="block text-sm font-medium text-gray-700">
+            Image
+          </label>
+          <div
+            class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md"
+          >
+            <div v-if="!uploadedimage" class="space-y-1 text-center">
+              <svg
+                class="mx-auto h-12 w-12 text-gray-400"
+                stroke="currentColor"
+                fill="none"
+                viewBox="0 0 48 48"
+                aria-hidden="true"
+              >
+                <path
+                  d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              <div class="flex text-sm text-gray-600">
+                <label
+                  for="file-upload"
+                  class="relative cursor-pointer bg-white rounded-md font-medium text-divelogBlue hover:text-divelogBlue focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-divelogBlue"
                 >
-                  <path
-                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                  <span>Upload a file</span>
+                  <input
+                    id="file-upload"
+                    name="file-upload"
+                    type="file"
+                    class="sr-only"
+                    accept="image/png, image/gif, image/jpeg"
+                    @change="onFileChanged"
+                    multiple="true"
                   />
-                </svg>
-                <div class="flex text-sm text-gray-600">
-                  <label
-                    for="file-upload"
-                    class="relative cursor-pointer rounded-md bg-white font-medium text-divelogBlue focus-within:outline-none focus-within:ring-2 focus-within:ring-divelogBlue focus-within:ring-offset-2 hover:text-divelogBlue"
-                  >
-                    <p class="text-center">Upload a file</p>
-                    <input
-                      id="file-upload"
-                      name="file-upload"
-                      type="file"
-                      class="sr-only"
-                      multiple="true"
-                    />
-                  </label>
-                </div>
-                <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                </label>
+              </div>
+              <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+            </div>
+
+            <div v-else>
+              <div class="flex justify-center">
+                <img
+                  crossorigin="anonymous"
+                  class="object-scale-down h-48 w-96 mt-3"
+                  :src="uploadedimage"
+                  alt=""
+                />
               </div>
             </div>
+          </div>
+          <div v-if="uploadedimage" class="flex justify-center">
+            <button
+              @click="uploadedimage = null"
+              type="button"
+              class="mt-2 inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-500 hover:bg-chsRed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-chsRed"
+            >
+              Bild entfernen
+            </button>
           </div>
         </div>
       </div>
@@ -367,6 +389,7 @@ import {
 import mapbox from 'mapbox-gl';
 import axios from 'axios';
 import { diveStore } from '../Store/Store.js';
+import imageCompression from 'browser-image-compression';
 
 const router = useRouter();
 const store = diveStore();
@@ -389,6 +412,8 @@ let time = ref(null);
 let airIn = ref(null);
 let airOut = ref(null);
 let weight = ref(null);
+
+let uploadedimage = ref(null);
 
 // Combobox Suit
 const suits = [
@@ -465,41 +490,70 @@ async function getCurrentPosition() {
     .addTo(map.value);
 }
 
+//Bild hochladen
+async function onFileChanged(event) {
+  let reader = new FileReader();
+
+  reader.addEventListener('load', async (readerEvent) => {
+    console.log(readerEvent);
+    uploadedimage.value = readerEvent.target.result; //Bild in der Vorschau setzen
+  });
+
+  //Bild komprimieren
+  let imageCompressed = await imageCompression(document.querySelector('#file-upload').files[0], {
+    maxSizeMB: 0.004,
+    maxWidthOrHeight: 1920,
+    useWebWorker: true,
+  });
+  reader.readAsDataURL(imageCompressed); //Bild laden
+}
+
 async function sendData(e) {
   e.preventDefault();
 
   if (coords.value) {
-    const { data } = await axios.post(`http://localhost:3000/addDive/${store.aktiverUser.u_id}`, {
-      title: title.value,
-      date: date.value,
-      country: country.value,
-      divesite: divesite.value,
-      depth: depth.value,
-      airIn: airIn.value,
-      airOut: airOut.value,
-      weight: weight.value,
-      air: selectedAir.value.name,
-      suit: selectedSuit.value.name,
-      coords: coords.value,
-      time: time.value,
-    });
+    try {
+      await axios.post(`http://localhost:3000/addDive/${store.aktiverUser.u_id}`, {
+        title: title.value,
+        date: date.value,
+        country: country.value,
+        divesite: divesite.value,
+        depth: depth.value,
+        airIn: airIn.value,
+        airOut: airOut.value,
+        weight: weight.value,
+        air: selectedAir.value.name,
+        suit: selectedSuit.value.name,
+        coords: coords.value,
+        time: time.value,
+        image: uploadedimage.value,
+      });
 
-    console.log(data);
+      router.go(-1);
+    } catch (error) {
+      console.log('Error');
+    }
   } else {
-    const { data } = await axios.post(`http://localhost:3000/addDive/${store.aktiverUser.u_id}`, {
-      title: title.value,
-      date: date.value,
-      country: country.value,
-      divesite: divesite.value,
-      depth: depth.value,
-      airIn: airIn.value,
-      airOut: airOut.value,
-      weight: weight.value,
-      air: selectedAir.value.name,
-      suit: selectedSuit.value.name,
-      coords: null,
-      time: time.value,
-    });
+    try {
+      await axios.post(`http://localhost:3000/addDive/${store.aktiverUser.u_id}`, {
+        title: title.value,
+        date: date.value,
+        country: country.value,
+        divesite: divesite.value,
+        depth: depth.value,
+        airIn: airIn.value,
+        airOut: airOut.value,
+        weight: weight.value,
+        air: selectedAir.value.name,
+        suit: selectedSuit.value.name,
+        coords: null,
+        time: time.value,
+      });
+
+      router.go(-1);
+    } catch (error) {
+      console.log('Error');
+    }
   }
 }
 </script>
