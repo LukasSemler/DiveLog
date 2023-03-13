@@ -376,7 +376,7 @@
 <script setup>
 import { ArrowLeftIcon } from '@heroicons/vue/20/solid';
 import { useRouter } from 'vue-router';
-import { computed, ref } from 'vue';
+import { computed, ref, toRaw, onMounted } from 'vue';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid';
 import {
   Combobox,
@@ -390,9 +390,14 @@ import mapbox from 'mapbox-gl';
 import axios from 'axios';
 import { diveStore } from '../Store/Store.js';
 import imageCompression from 'browser-image-compression';
+import { onlineTest } from '@/utils/onlineTest.js';
+import { openDB } from 'idb';
 
 const router = useRouter();
 const store = diveStore();
+
+const isOnline = ref(true);
+let db = null;
 
 //MAP
 let map = ref(null);
@@ -510,6 +515,47 @@ async function onFileChanged(event) {
 
 async function sendData(e) {
   e.preventDefault();
+  if (!isOnline.value) {
+    const a = await db.getAll('dives');
+    if (coords.value) {
+      await db.put('dives', {
+        new: true,
+        d_ID: a.length+2,
+        title: title.value,
+        date: date.value,
+        country: country.value,
+        divesite: divesite.value,
+        depth: depth.value,
+        airIn: airIn.value,
+        airOut: airOut.value,
+        weight: weight.value,
+        air: selectedAir.value.name,
+        suit: selectedSuit.value.name,
+        coords: coords.value,
+        time: time.value,
+      });
+    }
+    else {
+      await db.put('dives', {
+        new: true,
+        d_ID: a.length+2,
+        title: title.value,
+        date: date.value,
+        country: country.value,
+        divesite: divesite.value,
+        depth: depth.value,
+        airIn: airIn.value,
+        airOut: airOut.value,
+        weight: weight.value,
+        air: selectedAir.value.name,
+        suit: selectedSuit.value.name,
+        coords: null,
+        time: time.value,
+      });
+    }
+    router.go(-1);
+    return;
+  }
 
   if (coords.value) {
     try {
@@ -526,7 +572,6 @@ async function sendData(e) {
         suit: selectedSuit.value.name,
         coords: coords.value,
         time: time.value,
-        image: uploadedimage.value,
       });
 
       router.go(-1);
@@ -553,7 +598,29 @@ async function sendData(e) {
       router.go(-1);
     } catch (error) {
       console.log('Error');
+      isOnline.value = false;
+      sendData(e);
     }
   }
 }
+
+const openDataBase = async () => {
+  db = await openDB('divesDB', 1, {
+    upgrade(db) {
+      const store = db.createObjectStore('dives', { keyPath: 'd_ID' });
+    },
+  });
+};
+
+onMounted(async () => {
+  isOnline.value = await onlineTest();
+  window.addEventListener('online', () => {
+    isOnline.value = true;
+  });
+  window.addEventListener('offline', () => {
+    isOnline.value = false;
+    navigator.vibrate(200);
+  });
+  await openDataBase();
+});
 </script>

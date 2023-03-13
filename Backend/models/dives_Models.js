@@ -32,13 +32,12 @@ const addDiveDB = async (
   suit,
   time,
   u_id,
-  image
 ) => {
   const { rows } = await query('SELECT * FROM dive where fk_user = 3 ORDER BY nr ASC;');
 
   if (rows[0]) {
     const { rows: insert } = await query(
-      'INSERT INTO dive (title, date, location, divesite, "airIn", "airOut", depth, weight, "airType", suit, nr, fk_user,"diveTime", coords, image) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) returning *',
+      'INSERT INTO dive (title, date, location, divesite, "airIn", "airOut", depth, weight, "airType", suit, nr, fk_user,"diveTime", coords) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) returning *',
       [
         title,
         date,
@@ -54,7 +53,6 @@ const addDiveDB = async (
         u_id,
         time,
         JSON.stringify(coords),
-        image
       ],
     );
 

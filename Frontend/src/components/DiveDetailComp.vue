@@ -96,13 +96,20 @@
 import axios from 'axios';
 import mapbox from 'mapbox-gl';
 import { diveStore } from '../Store/Store.js';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, toRaw , onUpdated} from 'vue';
+import { onlineTest } from '@/utils/onlineTest.js';
+import { openDB } from 'idb';
 
 const props = defineProps({
   diveID: String,
 });
 
 const store = diveStore();
+
+const isOnline = ref(true);
+let db = null;
+const diveDetail = ref();
+
 //MAP
 let map = ref(null);
 let mapAccessToken = ref(
@@ -111,13 +118,43 @@ let mapAccessToken = ref(
 let mapStyle = 'mapbox://styles/lukassemler/clbaoba0t007t14nt6n0qujvl';
 let mapHeight = ref('0px');
 
-const { data } = await axios.get(
-  `http://localhost:3000/getDiveInfo/${store.aktiverUser.u_id}/${props.diveID}`,
-);
+const getDiveDetail = async () => {
+  if (!isOnline.value) {
+    let data = await db.get('dives',parseInt(props.diveID));
+    diveDetail.value = data;
+    return;
+  }
+  try {
+    const { data } = await axios.get(`http://localhost:3000/getdiveinfo/${store.aktiverUser.u_id}/${props.diveID}`);
+    diveDetail.value = data[0];
+  } catch (error) {
+    console.error(error);
+    isOnline.value = false;
+    getDiveDetail();
+  }
+};
 
-const coordinaten = JSON.parse(data[0].coords);
+const openDataBase = async () => {
+  db = await openDB('divesDB', 1, {
+    upgrade(db) {
+      const store = db.createObjectStore('dives', { keyPath: 'd_ID' });
+    },
+  });
+};
+
 
 onMounted(async () => {
+  isOnline.value = await onlineTest();
+  window.addEventListener('online', () => {
+    isOnline.value = true;
+  });
+  window.addEventListener('offline', () => {
+    isOnline.value = false;
+    navigator.vibrate(200);
+  });
+  await openDataBase();
+  await getDiveDetail();
+  const coordinaten = JSON.parse(diveDetail.value.coords);
   mapHeight.value = '300px';
 
   mapbox.accessToken = mapAccessToken.value;
@@ -136,5 +173,7 @@ onMounted(async () => {
     .addTo(map.value);
 });
 
-let diveDetail = ref(data[0]);
+onUpdated(async () => {
+   await getDiveDetail();
+})
 </script>

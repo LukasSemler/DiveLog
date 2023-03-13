@@ -92,11 +92,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, toRaw } from 'vue';
 import axios from 'axios';
 import { diveStore } from '../Store/Store.js';
 import { useRouter } from 'vue-router';
 import mapbox from 'mapbox-gl';
+import { onlineTest } from '@/utils/onlineTest.js';
+import { openDB } from 'idb';
 
 //MAP
 let map = ref(null);
@@ -108,12 +110,50 @@ let mapStyle = 'mapbox://styles/lukassemler/clbaoba0t007t14nt6n0qujvl';
 const router = useRouter();
 const store = diveStore();
 let dives = ref([]);
+const isOnline = ref(true);
+let db = null;
 
-const { data } = await axios.get(`http://localhost:3000/dives/${store.aktiverUser.u_id}`);
-console.log(data);
-dives.value = data;
+const getDives = async () => {
+  if (!isOnline.value) {
+    let data = await db.getAll('dives');
+    dives.value = data;
+    return;
+  }
+  try {
+    const { data } = await axios.get(`http://localhost:3000/dives/${store.aktiverUser.u_id}`);
+    console.log(data);
+    dives.value = data;
+    await db.clear('dives');
+    dives.value.forEach((e) => {
+      db.put('dives', toRaw(e));
+    });
+  } catch (error) {
+    console.error(error);
+    isOnline.value = false;
+    getDives();
+  }
+};
 
-onMounted(() => {
+
+const openDataBase = async () => {
+  db = await openDB('divesDB', 1, {
+    upgrade(db) {
+      const store = db.createObjectStore('dives', { keyPath: 'd_ID' });
+    },
+  });
+};
+
+onMounted(async () => {
+  isOnline.value = await onlineTest();
+  window.addEventListener('online', () => {
+    isOnline.value = true;
+  });
+  window.addEventListener('offline', () => {
+    isOnline.value = false;
+    navigator.vibrate(200);
+  });
+  await openDataBase();
+  await getDives();
   map.value = new mapbox.Map({
     container: 'map',
     style: mapStyle,

@@ -4,13 +4,36 @@ import { RouterView } from 'vue-router';
 import { diveStore } from './Store/Store.js';
 import { onlineTest } from '@/utils/onlineTest.js';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
+import { openDB } from 'idb';
+import axios from 'axios';
 
 let update = ref(false);
 let isOnline = ref(true);
+let db = null;
 
 const store = diveStore();
 
+const synchronize = async () => {
+  const all = await db.getAll('dives');
+  await all.forEach((el) => {
+    if (el.new) {
+      delete el.new;
+      delete el.d_ID;
+      axios.post(`http://localhost:3000/addDive/${store.aktiverUser.u_id}`, el);
+    };
+  })
+};
+
+const openDataBase = async () => {
+  db = await openDB('divesDB', 1, {
+    upgrade(db) {
+      const store = db.createObjectStore('dives', { keyPath: 'd_ID' });
+    },
+  });
+};
+
 onMounted(async () => {
+  if (!window.indexedDB) alert('IndexedDB is not available!');
   if (localStorage.getItem(store.$id)) {
     store.$state = JSON.parse(localStorage.getItem(store.$id));
   }
@@ -20,7 +43,10 @@ onMounted(async () => {
     isOnline.value = true;
     synchronize();
   });
-  window.addEventListener('offline', () => (isOnline.value = false));
+  window.addEventListener('offline', () => {
+    isOnline.value = false;
+    navigator.vibrate(200);
+  });
   const registration = await navigator.serviceWorker.getRegistration();
   if (!registration) {
     console.log('registration failed!');
@@ -45,6 +71,7 @@ const onRestart = async () => {
 </script>
 
 <template>
+  <div v-if="!isOnline">Du bist offline 😢</div>
   <TransitionRoot as="template" :show="update">
     <Dialog as="div" class="relative z-10" @close="update = true">
       <TransitionChild

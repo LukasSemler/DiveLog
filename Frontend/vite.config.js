@@ -21,37 +21,12 @@ export default defineConfig({
       filename: 'service-worker.js',
       includeAssets: ['**/*.{js,css,html,jpg,ico,xml,svg,png,ttf,woff2}'],
       workbox: {
+        manifest,
+        strategies: 'injectManifest',
+        srcDir: 'src',
+        filename: 'service-worker.js',
         mode: 'development',
-        runtimeCaching: [
-          {
-            urlPattern: '/dives',
-            handler: 'Dives',
-            options: {
-              cacheName: 'roberts-employees',
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24 * 1, // <== 1 day
-              },
-              cacheableResponse: {
-                statuses: [0, 200],
-              },
-            },
-          },
-          // {
-          //   urlPattern: /.*images\/portraits\/*.*.jpg/,
-          //   handler: 'CacheFirst',
-          //   options: {
-          //     cacheName: 'roberts-images',
-          //     expiration: {
-          //       maxEntries: 50,
-          //       maxAgeSeconds: 60 * 60 * 24 * 1, // <== 1 day
-          //     },
-          //     cacheableResponse: {
-          //       statuses: [0, 200],
-          //     },
-          //   },
-          // },
-        ],
+        includeAssets: ['**/*.{js,css,html,jpg,ico,xml,svg,png,ttf,woff2}'],
       },
     }),
   ],
