@@ -16,12 +16,13 @@ const store = diveStore();
 const synchronize = async () => {
   const all = await db.getAll('dives');
   await all.forEach((el) => {
+    console.log(el);
     if (el.new) {
       delete el.new;
       delete el.d_ID;
       axios.post(`http://localhost:3000/addDive/${store.aktiverUser.u_id}`, el);
-    };
-  })
+    }
+  });
 };
 
 const openDataBase = async () => {
@@ -71,7 +72,15 @@ const onRestart = async () => {
 </script>
 
 <template>
-  <div v-if="!isOnline">Du bist offline 😢</div>
+  <div
+    class="flex items-center gap-x-6 bg-divelogBlue py-2.5 px-6 sm:px-3.5 sm:before:flex-1"
+    v-if="!isOnline"
+  >
+    <p class="text-sm leading-6 text-white">
+      <a>Du bist offline 😢</a>
+    </p>
+  </div>
+  <div></div>
   <TransitionRoot as="template" :show="update">
     <Dialog as="div" class="relative z-10" @close="update = true">
       <TransitionChild
@@ -106,7 +115,7 @@ const onRestart = async () => {
                 <div
                   class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100"
                 >
-                  <CloudDownloadIcon class="h-6 w-6 text-chsBlue" aria-hidden="true" />
+                  <CloudDownloadIcon class="h-6 w-6 text-divelogBlue" aria-hidden="true" />
                 </div>
                 <div class="mt-3 text-center sm:mt-5">
                   <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900"
@@ -123,10 +132,10 @@ const onRestart = async () => {
               <div class="mt-5 sm:mt-6">
                 <button
                   type="button"
-                  class="inline-flex w-full justify-center rounded-md border border-transparent bg-chsBlue px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-chsDarkBlue sm:text-sm"
+                  class="inline-flex w-full justify-center rounded-md border border-transparent bg-divelogBlue px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-divelogDarkBlue sm:text-sm"
                   @click="onRestart"
                 >
-                  Update
+                  Update App
                 </button>
               </div>
             </DialogPanel>

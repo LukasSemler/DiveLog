@@ -13,7 +13,7 @@ export default {
       type: 'image/png',
     },
   ],
-  theme_color: '#ffffff',
-  background_color: '#ffffff',
+  theme_color: '#03C7FC',
+  background_color: '#03C7FC',
   display: 'standalone',
 };

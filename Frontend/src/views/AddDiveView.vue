@@ -287,9 +287,7 @@
           </p>
         </div>
         <div class="sm:col-span-2">
-          <label for="cover-photo" class="block text-sm font-medium text-gray-700">
-            Image
-          </label>
+          <label for="cover-photo" class="block text-sm font-medium text-gray-700"> Image </label>
           <div
             class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md"
           >
@@ -517,41 +515,48 @@ async function sendData(e) {
   e.preventDefault();
   if (!isOnline.value) {
     const a = await db.getAll('dives');
+    console.log('aaaaaaaaaaa');
+    console.log(a);
     if (coords.value) {
-      await db.put('dives', {
-        new: true,
-        d_ID: a.length+2,
-        title: title.value,
-        date: date.value,
-        country: country.value,
-        divesite: divesite.value,
-        depth: depth.value,
-        airIn: airIn.value,
-        airOut: airOut.value,
-        weight: weight.value,
-        air: selectedAir.value.name,
-        suit: selectedSuit.value.name,
-        coords: coords.value,
-        time: time.value,
-      });
-    }
-    else {
-      await db.put('dives', {
-        new: true,
-        d_ID: a.length+2,
-        title: title.value,
-        date: date.value,
-        country: country.value,
-        divesite: divesite.value,
-        depth: depth.value,
-        airIn: airIn.value,
-        airOut: airOut.value,
-        weight: weight.value,
-        air: selectedAir.value.name,
-        suit: selectedSuit.value.name,
-        coords: null,
-        time: time.value,
-      });
+      await db.put(
+        'dives',
+        toRaw({
+          new: true,
+          d_ID: a.length + 2,
+          title: title.value,
+          date: date.value,
+          country: country.value,
+          divesite: divesite.value,
+          depth: depth.value,
+          airIn: airIn.value,
+          airOut: airOut.value,
+          weight: weight.value,
+          air: selectedAir.value.name,
+          suit: selectedSuit.value.name,
+          coords: coords.value,
+          time: time.value,
+        }),
+      );
+    } else {
+      await db.put(
+        'dives',
+        toRaw({
+          new: true,
+          d_ID: a.length + 2,
+          title: title.value,
+          date: date.value,
+          country: country.value,
+          divesite: divesite.value,
+          depth: depth.value,
+          airIn: airIn.value,
+          airOut: airOut.value,
+          weight: weight.value,
+          air: selectedAir.value.name,
+          suit: selectedSuit.value.name,
+          coords: null,
+          time: time.value,
+        }),
+      );
     }
     router.go(-1);
     return;
@@ -607,9 +612,11 @@ async function sendData(e) {
 const openDataBase = async () => {
   db = await openDB('divesDB', 1, {
     upgrade(db) {
-      const store = db.createObjectStore('dives', { keyPath: 'd_ID' });
+      db.createObjectStore('dives', { keyPath: 'd_ID' });
     },
   });
+
+  console.log(db);
 };
 
 onMounted(async () => {
